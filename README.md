@@ -49,18 +49,24 @@
    git clone https://github.com/pequod44/Library-management-API.git
    cd Library-management-API
    ```
-
-2. Установите зависимости:
+   
+2. Создайте и активируйте виртуальное окружение:
+   ```bash
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
+   
+3. Установите зависимости:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Настройте переменные окружения в файле `.env`:
+4. Настройте переменные окружения в файле `.env`:
    ```env
    DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<database>
    ```
 
-4. Запустите приложение:
+5. Запустите приложение:
    ```bash
    uvicorn app.main:app --reload
    ```
