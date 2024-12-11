@@ -3,9 +3,8 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from config.db import SessionLocal, engine
-from config import models
-import schemas
-from config.CRUD import AuthorRepository, BookRepository, BorrowRepository
+from core import schemas, models
+from core.CRUD import AuthorRepository, BookRepository, BorrowRepository
 
 models.Base.metadata.create_all(bind=engine)
 
