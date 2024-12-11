@@ -1,12 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 from typing import List
-import uvicorn
 
-from db import SessionLocal, engine
-import models
+from config.db import SessionLocal, engine
+from config import models
 import schemas
-from CRUD import AuthorRepository, BookRepository, BorrowRepository
+from config.CRUD import AuthorRepository, BookRepository, BorrowRepository
 
 models.Base.metadata.create_all(bind=engine)
 

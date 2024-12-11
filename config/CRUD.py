@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
-import models, schemas
+import schemas
+from config import models
 from datetime import datetime
 
 

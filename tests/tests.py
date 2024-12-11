@@ -1,14 +1,11 @@
 import pytest
 from fastapi.testclient import TestClient
 from main import app
-from db import SessionLocal, Base, engine
-import models
+from config.db import SessionLocal, Base, engine
 
-# Создаем тестового клиента
 client = TestClient(app)
 
 
-# Настройка тестовой базы данных
 def override_get_db():
     try:
         db = SessionLocal()
@@ -17,20 +14,13 @@ def override_get_db():
         db.close()
 
 
-# Fixture для создания и очистки тестовой базы данных
 @pytest.fixture(scope="module")
 def test_db():
-    # Создаем все таблицы
     Base.metadata.create_all(bind=engine)
-
-    # Выполняем тесты
     yield
-
-    # Удаляем все таблицы после тестов
     Base.metadata.drop_all(bind=engine)
 
 
-# Тест создания автора
 def test_create_author(test_db):
     author_data = {
         "first_name": "Лев",
@@ -47,9 +37,7 @@ def test_create_author(test_db):
     assert "id" in data
 
 
-# Тест получения списка авторов
 def test_get_authors(test_db):
-    # Предварительно создаем парочку авторов
     authors_data = [
         {"first_name": "Федор", "last_name": "Достоевский", "birth_date": "1821-11-11"},
         {"first_name": "Антон", "last_name": "Чехов", "birth_date": "1860-01-29"}
@@ -65,9 +53,7 @@ def test_get_authors(test_db):
     assert len(authors) >= 2
 
 
-# Тест создания книги
 def test_create_book(test_db):
-    # Сначала создадим автора
     author_response = client.post("/authors", json={
         "first_name": "Александр",
         "last_name": "Пушкин",
@@ -90,9 +76,7 @@ def test_create_book(test_db):
     assert data["available_copies"] == 5
 
 
-# Тест создания выдачи книги
 def test_create_borrow(test_db):
-    # Создаем автора
     author_response = client.post("/authors", json={
         "first_name": "Михаил",
         "last_name": "Булгаков",
@@ -100,7 +84,6 @@ def test_create_borrow(test_db):
     })
     author_id = author_response.json()["id"]
 
-    # Создаем книгу
     book_response = client.post("/books", json={
         "title": "Мастер и Маргарита",
         "description": "Роман",
@@ -109,7 +92,6 @@ def test_create_borrow(test_db):
     })
     book_id = book_response.json()["id"]
 
-    # Создаем выдачу
     borrow_data = {
         "book_id": book_id,
         "reader_name": "Иван Иванов"
@@ -123,9 +105,7 @@ def test_create_borrow(test_db):
     assert data["book_id"] == book_id
 
 
-# Тест возврата книги
 def test_return_book(test_db):
-    # Создаем автора
     author_response = client.post("/authors", json={
         "first_name": "Николай",
         "last_name": "Гоголь",
@@ -133,7 +113,6 @@ def test_return_book(test_db):
     })
     author_id = author_response.json()["id"]
 
-    # Создаем книгу
     book_response = client.post("/books", json={
         "title": "Мертвые души",
         "description": "Поэма",
@@ -142,14 +121,12 @@ def test_return_book(test_db):
     })
     book_id = book_response.json()["id"]
 
-    # Создаем выдачу
     borrow_response = client.post("/borrows", json={
         "book_id": book_id,
         "reader_name": "Петр Петров"
     })
     borrow_id = borrow_response.json()["id"]
 
-    # Возвращаем книгу
     return_response = client.patch(f"/borrows/{borrow_id}/return")
 
     assert return_response.status_code == 200
